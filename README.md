@@ -1,4 +1,4 @@
-# Fraud-Churn Fusion XAI: AI Model Compatibility & Fusion Platform
+# Mergence: Model Compatibility Evaluation & Fusion Optimization Platform
 
 **Project Overview**  
 This project builds a platform to evaluate the compatibility of AI models for merging ("model fusion"), particularly focused on fraud detection and customer churn prediction models. The goal is to create a composite metric that predicts the quality of merged offspring models and to integrate this metric within an evolutionary merging framework inspired by M2N2. An Explainable AI (XAI) component provides transparency on compatibility and fusion outcomes.
