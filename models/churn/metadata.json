@@ -1,0 +1,266 @@
+[
+  {
+    "variant_id": 0,
+    "hyperparams": {
+      "n_estimators": 50,
+      "max_depth": 10,
+      "min_samples_split": 5
+    },
+    "auc": 0.9592782040352372,
+    "path": "./models/churn/churn_v00.pkl",
+    "timestamp": "2026-03-08T20:55:38.563274"
+  },
+  {
+    "variant_id": 1,
+    "hyperparams": {
+      "n_estimators": 50,
+      "max_depth": 10,
+      "min_samples_split": 10
+    },
+    "auc": 0.9552197163450361,
+    "path": "./models/churn/churn_v01.pkl",
+    "timestamp": "2026-03-08T20:55:38.996343"
+  },
+  {
+    "variant_id": 2,
+    "hyperparams": {
+      "n_estimators": 50,
+      "max_depth": 15,
+      "min_samples_split": 5
+    },
+    "auc": 0.9573225864785967,
+    "path": "./models/churn/churn_v02.pkl",
+    "timestamp": "2026-03-08T20:55:39.455377"
+  },
+  {
+    "variant_id": 3,
+    "hyperparams": {
+      "n_estimators": 50,
+      "max_depth": 15,
+      "min_samples_split": 10
+    },
+    "auc": 0.9691492934459687,
+    "path": "./models/churn/churn_v03.pkl",
+    "timestamp": "2026-03-08T20:55:39.887120"
+  },
+  {
+    "variant_id": 4,
+    "hyperparams": {
+      "n_estimators": 50,
+      "max_depth": 20,
+      "min_samples_split": 10
+    },
+    "auc": 0.9638352837841329,
+    "path": "./models/churn/churn_v04.pkl",
+    "timestamp": "2026-03-08T20:55:40.413067"
+  },
+  {
+    "variant_id": 5,
+    "hyperparams": {
+      "n_estimators": 100,
+      "max_depth": 10,
+      "min_samples_split": 5
+    },
+    "auc": 0.9425611614869926,
+    "path": "./models/churn/churn_v05.pkl",
+    "timestamp": "2026-03-08T20:55:40.945531"
+  },
+  {
+    "variant_id": 6,
+    "hyperparams": {
+      "n_estimators": 100,
+      "max_depth": 10,
+      "min_samples_split": 10
+    },
+    "auc": 0.959074117130383,
+    "path": "./models/churn/churn_v06.pkl",
+    "timestamp": "2026-03-08T20:55:41.482567"
+  },
+  {
+    "variant_id": 7,
+    "hyperparams": {
+      "n_estimators": 100,
+      "max_depth": 15,
+      "min_samples_split": 5
+    },
+    "auc": 0.9573510036425636,
+    "path": "./models/churn/churn_v07.pkl",
+    "timestamp": "2026-03-08T20:55:42.073851"
+  },
+  {
+    "variant_id": 8,
+    "hyperparams": {
+      "n_estimators": 100,
+      "max_depth": 15,
+      "min_samples_split": 10
+    },
+    "auc": 0.9653930610452349,
+    "path": "./models/churn/churn_v08.pkl",
+    "timestamp": "2026-03-08T20:55:42.667647"
+  },
+  {
+    "variant_id": 9,
+    "hyperparams": {
+      "n_estimators": 100,
+      "max_depth": 20,
+      "min_samples_split": 10
+    },
+    "auc": 0.964902219122168,
+    "path": "./models/churn/churn_v09.pkl",
+    "timestamp": "2026-03-08T20:55:43.296128"
+  },
+  {
+    "variant_id": 10,
+    "hyperparams": {
+      "n_estimators": 150,
+      "max_depth": 10,
+      "min_samples_split": 5
+    },
+    "auc": 0.9509235578289287,
+    "path": "./models/churn/churn_v10.pkl",
+    "timestamp": "2026-03-08T20:55:43.924009"
+  },
+  {
+    "variant_id": 11,
+    "hyperparams": {
+      "n_estimators": 150,
+      "max_depth": 10,
+      "min_samples_split": 20
+    },
+    "auc": 0.953176263917952,
+    "path": "./models/churn/churn_v11.pkl",
+    "timestamp": "2026-03-08T20:55:44.529034"
+  },
+  {
+    "variant_id": 12,
+    "hyperparams": {
+      "n_estimators": 150,
+      "max_depth": 15,
+      "min_samples_split": 10
+    },
+    "auc": 0.9663463277274018,
+    "path": "./models/churn/churn_v12.pkl",
+    "timestamp": "2026-03-08T20:55:45.228526"
+  },
+  {
+    "variant_id": 13,
+    "hyperparams": {
+      "n_estimators": 150,
+      "max_depth": 15,
+      "min_samples_split": 20
+    },
+    "auc": 0.9664341625978455,
+    "path": "./models/churn/churn_v13.pkl",
+    "timestamp": "2026-03-08T20:55:45.934842"
+  },
+  {
+    "variant_id": 14,
+    "hyperparams": {
+      "n_estimators": 150,
+      "max_depth": 20,
+      "min_samples_split": 5
+    },
+    "auc": 0.9656462321423958,
+    "path": "./models/churn/churn_v14.pkl",
+    "timestamp": "2026-03-08T20:55:46.726587"
+  },
+  {
+    "variant_id": 15,
+    "hyperparams": {
+      "n_estimators": 200,
+      "max_depth": 10,
+      "min_samples_split": 10
+    },
+    "auc": 0.9606603115554522,
+    "path": "./models/churn/churn_v15.pkl",
+    "timestamp": "2026-03-08T20:55:47.457134"
+  },
+  {
+    "variant_id": 16,
+    "hyperparams": {
+      "n_estimators": 200,
+      "max_depth": 10,
+      "min_samples_split": 20
+    },
+    "auc": 0.9558578108450231,
+    "path": "./models/churn/churn_v16.pkl",
+    "timestamp": "2026-03-08T20:55:48.214427"
+  },
+  {
+    "variant_id": 17,
+    "hyperparams": {
+      "n_estimators": 200,
+      "max_depth": 15,
+      "min_samples_split": 5
+    },
+    "auc": 0.9560644811284196,
+    "path": "./models/churn/churn_v17.pkl",
+    "timestamp": "2026-03-08T20:55:49.062398"
+  },
+  {
+    "variant_id": 18,
+    "hyperparams": {
+      "n_estimators": 200,
+      "max_depth": 15,
+      "min_samples_split": 20
+    },
+    "auc": 0.9666614999095817,
+    "path": "./models/churn/churn_v18.pkl",
+    "timestamp": "2026-03-08T20:55:49.981135"
+  },
+  {
+    "variant_id": 19,
+    "hyperparams": {
+      "n_estimators": 200,
+      "max_depth": 20,
+      "min_samples_split": 10
+    },
+    "auc": 0.9677930197111783,
+    "path": "./models/churn/churn_v19.pkl",
+    "timestamp": "2026-03-08T20:55:51.032022"
+  },
+  {
+    "variant_id": 20,
+    "hyperparams": {
+      "n_estimators": 75,
+      "max_depth": 12,
+      "min_samples_split": 8
+    },
+    "auc": 0.9575705908186727,
+    "path": "./models/churn/churn_v20.pkl",
+    "timestamp": "2026-03-08T20:55:51.546250"
+  },
+  {
+    "variant_id": 21,
+    "hyperparams": {
+      "n_estimators": 125,
+      "max_depth": 12,
+      "min_samples_split": 15
+    },
+    "auc": 0.9605647265493813,
+    "path": "./models/churn/churn_v21.pkl",
+    "timestamp": "2026-03-08T20:55:52.201981"
+  },
+  {
+    "variant_id": 22,
+    "hyperparams": {
+      "n_estimators": 175,
+      "max_depth": 18,
+      "min_samples_split": 12
+    },
+    "auc": 0.9681288589216978,
+    "path": "./models/churn/churn_v22.pkl",
+    "timestamp": "2026-03-08T20:55:53.346743"
+  },
+  {
+    "variant_id": 23,
+    "hyperparams": {
+      "n_estimators": 225,
+      "max_depth": 20,
+      "min_samples_split": 15
+    },
+    "auc": 0.9676612674055128,
+    "path": "./models/churn/churn_v23.pkl",
+    "timestamp": "2026-03-08T20:55:54.961059"
+  }
+]

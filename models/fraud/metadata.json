@@ -1,0 +1,266 @@
+[
+  {
+    "variant_id": 0,
+    "hyperparams": {
+      "n_estimators": 50,
+      "max_depth": 10,
+      "min_samples_split": 5
+    },
+    "auc": 0.9648653017691889,
+    "path": "./models/fraud/fraud_v00.pkl",
+    "timestamp": "2026-03-08T20:36:41.260388"
+  },
+  {
+    "variant_id": 1,
+    "hyperparams": {
+      "n_estimators": 50,
+      "max_depth": 10,
+      "min_samples_split": 10
+    },
+    "auc": 0.9445559097298417,
+    "path": "./models/fraud/fraud_v01.pkl",
+    "timestamp": "2026-03-08T20:37:00.280484"
+  },
+  {
+    "variant_id": 2,
+    "hyperparams": {
+      "n_estimators": 50,
+      "max_depth": 15,
+      "min_samples_split": 5
+    },
+    "auc": 0.9602859242508841,
+    "path": "./models/fraud/fraud_v02.pkl",
+    "timestamp": "2026-03-08T20:37:18.572296"
+  },
+  {
+    "variant_id": 3,
+    "hyperparams": {
+      "n_estimators": 50,
+      "max_depth": 15,
+      "min_samples_split": 10
+    },
+    "auc": 0.9490415461612142,
+    "path": "./models/fraud/fraud_v03.pkl",
+    "timestamp": "2026-03-08T20:37:34.976591"
+  },
+  {
+    "variant_id": 4,
+    "hyperparams": {
+      "n_estimators": 50,
+      "max_depth": 20,
+      "min_samples_split": 10
+    },
+    "auc": 0.9453181947826443,
+    "path": "./models/fraud/fraud_v04.pkl",
+    "timestamp": "2026-03-08T20:37:53.353181"
+  },
+  {
+    "variant_id": 5,
+    "hyperparams": {
+      "n_estimators": 100,
+      "max_depth": 10,
+      "min_samples_split": 5
+    },
+    "auc": 0.983048378390682,
+    "path": "./models/fraud/fraud_v05.pkl",
+    "timestamp": "2026-03-08T20:38:24.110851"
+  },
+  {
+    "variant_id": 6,
+    "hyperparams": {
+      "n_estimators": 100,
+      "max_depth": 10,
+      "min_samples_split": 10
+    },
+    "auc": 0.9765658431262884,
+    "path": "./models/fraud/fraud_v06.pkl",
+    "timestamp": "2026-03-08T20:38:51.497496"
+  },
+  {
+    "variant_id": 7,
+    "hyperparams": {
+      "n_estimators": 100,
+      "max_depth": 15,
+      "min_samples_split": 5
+    },
+    "auc": 0.9491620438715719,
+    "path": "./models/fraud/fraud_v07.pkl",
+    "timestamp": "2026-03-08T20:39:20.869769"
+  },
+  {
+    "variant_id": 8,
+    "hyperparams": {
+      "n_estimators": 100,
+      "max_depth": 15,
+      "min_samples_split": 10
+    },
+    "auc": 0.9620740656782201,
+    "path": "./models/fraud/fraud_v08.pkl",
+    "timestamp": "2026-03-08T20:39:49.354497"
+  },
+  {
+    "variant_id": 9,
+    "hyperparams": {
+      "n_estimators": 100,
+      "max_depth": 20,
+      "min_samples_split": 10
+    },
+    "auc": 0.9607611330315161,
+    "path": "./models/fraud/fraud_v09.pkl",
+    "timestamp": "2026-03-08T20:40:18.591284"
+  },
+  {
+    "variant_id": 10,
+    "hyperparams": {
+      "n_estimators": 150,
+      "max_depth": 10,
+      "min_samples_split": 5
+    },
+    "auc": 0.9922266434652057,
+    "path": "./models/fraud/fraud_v10.pkl",
+    "timestamp": "2026-03-08T20:41:00.084055"
+  },
+  {
+    "variant_id": 11,
+    "hyperparams": {
+      "n_estimators": 150,
+      "max_depth": 10,
+      "min_samples_split": 20
+    },
+    "auc": 0.9811462425989599,
+    "path": "./models/fraud/fraud_v11.pkl",
+    "timestamp": "2026-03-08T20:41:41.877530"
+  },
+  {
+    "variant_id": 12,
+    "hyperparams": {
+      "n_estimators": 150,
+      "max_depth": 15,
+      "min_samples_split": 10
+    },
+    "auc": 0.9790712107093384,
+    "path": "./models/fraud/fraud_v12.pkl",
+    "timestamp": "2026-03-08T20:42:26.668650"
+  },
+  {
+    "variant_id": 13,
+    "hyperparams": {
+      "n_estimators": 150,
+      "max_depth": 15,
+      "min_samples_split": 20
+    },
+    "auc": 0.9561326087986554,
+    "path": "./models/fraud/fraud_v13.pkl",
+    "timestamp": "2026-03-08T20:43:10.012379"
+  },
+  {
+    "variant_id": 14,
+    "hyperparams": {
+      "n_estimators": 150,
+      "max_depth": 20,
+      "min_samples_split": 5
+    },
+    "auc": 0.9554153826429411,
+    "path": "./models/fraud/fraud_v14.pkl",
+    "timestamp": "2026-03-08T20:43:54.014005"
+  },
+  {
+    "variant_id": 15,
+    "hyperparams": {
+      "n_estimators": 200,
+      "max_depth": 10,
+      "min_samples_split": 10
+    },
+    "auc": 0.963850872702577,
+    "path": "./models/fraud/fraud_v15.pkl",
+    "timestamp": "2026-03-08T20:44:48.567787"
+  },
+  {
+    "variant_id": 16,
+    "hyperparams": {
+      "n_estimators": 200,
+      "max_depth": 10,
+      "min_samples_split": 20
+    },
+    "auc": 0.9735979018347797,
+    "path": "./models/fraud/fraud_v16.pkl",
+    "timestamp": "2026-03-08T20:45:43.027543"
+  },
+  {
+    "variant_id": 17,
+    "hyperparams": {
+      "n_estimators": 200,
+      "max_depth": 15,
+      "min_samples_split": 5
+    },
+    "auc": 0.9842588368858636,
+    "path": "./models/fraud/fraud_v17.pkl",
+    "timestamp": "2026-03-08T20:46:41.253617"
+  },
+  {
+    "variant_id": 18,
+    "hyperparams": {
+      "n_estimators": 200,
+      "max_depth": 15,
+      "min_samples_split": 20
+    },
+    "auc": 0.9630433429428013,
+    "path": "./models/fraud/fraud_v18.pkl",
+    "timestamp": "2026-03-08T20:47:37.757969"
+  },
+  {
+    "variant_id": 19,
+    "hyperparams": {
+      "n_estimators": 200,
+      "max_depth": 20,
+      "min_samples_split": 10
+    },
+    "auc": 0.9640397484505778,
+    "path": "./models/fraud/fraud_v19.pkl",
+    "timestamp": "2026-03-08T20:48:34.156467"
+  },
+  {
+    "variant_id": 20,
+    "hyperparams": {
+      "n_estimators": 75,
+      "max_depth": 12,
+      "min_samples_split": 8
+    },
+    "auc": 0.9670870305629389,
+    "path": "./models/fraud/fraud_v20.pkl",
+    "timestamp": "2026-03-08T20:48:58.989107"
+  },
+  {
+    "variant_id": 21,
+    "hyperparams": {
+      "n_estimators": 125,
+      "max_depth": 12,
+      "min_samples_split": 15
+    },
+    "auc": 0.9831601430364494,
+    "path": "./models/fraud/fraud_v21.pkl",
+    "timestamp": "2026-03-08T20:49:36.078983"
+  },
+  {
+    "variant_id": 22,
+    "hyperparams": {
+      "n_estimators": 175,
+      "max_depth": 18,
+      "min_samples_split": 12
+    },
+    "auc": 0.9635521833126001,
+    "path": "./models/fraud/fraud_v22.pkl",
+    "timestamp": "2026-03-08T20:50:24.402017"
+  },
+  {
+    "variant_id": 23,
+    "hyperparams": {
+      "n_estimators": 225,
+      "max_depth": 20,
+      "min_samples_split": 15
+    },
+    "auc": 0.9615747016125511,
+    "path": "./models/fraud/fraud_v23.pkl",
+    "timestamp": "2026-03-08T20:51:27.656557"
+  }
+]

@@ -1,0 +1,30 @@
+# Core ML
+pandas==2.1.2 
+numpy==1.24.3
+scikit-learn==1.3.1 
+scipy==1.11.2
+
+# Deep Learning (for advanced features)
+torch==2.0.1
+torchvision==0.15.2
+
+# Visualization & Explanation
+matplotlib==3.7.2
+seaborn==0.12.2
+shap
+plotly==5.17.0
+
+# Utilities
+joblib==1.3.1
+tqdm==4.65.0
+pyyaml==6.0.1
+cma==3.4.0
+
+# Deployment
+streamlit==1.27.0
+
+# TabPFN (optional, for enhancement phase)
+tabpfn-client==0.1.0
+
+# M2N2
+# have to nstall manually: git clone https://github.com/SakanaAI/natural_niches
