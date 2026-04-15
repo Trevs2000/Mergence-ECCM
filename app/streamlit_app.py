@@ -59,7 +59,7 @@ COLOURS = {"PSC": "#4c72b0", "FSC": "#55a868", "RSC": "#c44e52", "ECCM": "#8172b
  
 # ── BlendedModel ──────────────────────────────────────────────────────────────
 class BlendedModel(BaseEstimator, ClassifierMixin):
-    """Sklearn-compatible blended RF — has feature_importances_, predict_proba, predict."""
+    """Sklearn-compatible blended RF - has feature_importances_, predict_proba, predict."""
     def __init__(self, model_a=None, model_b=None, ratio: float = 0.5):
         self.model_a, self.model_b, self.ratio = model_a, model_b, ratio
  
@@ -105,10 +105,10 @@ def load_epc(task: str) -> EPCTrainer:
  
 # ── Data resolution ───────────────────────────────────────────────────────────
 DATA_MODE_LABELS = {
-    "full":        ("🟢 Full ECCM",    "Real CSV — all metrics fully accurate."),
-    "embedded":    ("🟡 Full ECCM",    "Embedded training sample used — accurate."),
-    "synthetic":   ("🟠 Partial ECCM", "Synthetic data — FSC is approximate. Upload a CSV for best results."),
-    "pscrsc_only": ("🔴 Minimal ECCM", "No data — FSC imputed from history. Only PSC and RSC directly measured."),
+    "full":        ("🟢 Full ECCM",    "Real CSV - all metrics fully accurate."),
+    "embedded":    ("🟡 Full ECCM",    "Embedded training sample used - accurate."),
+    "synthetic":   ("🟠 Partial ECCM", "Synthetic data - FSC is approximate. Upload a CSV for best results."),
+    "pscrsc_only": ("🔴 Minimal ECCM", "No data - FSC imputed from history. Only PSC and RSC directly measured."),
 }
  
 def resolve_data(model_a, uploaded_X):
@@ -143,16 +143,16 @@ def compute_shap_values(
     only practical choice in an interactive app.
  
     We also cap the number of rows explained at max_explain. For beeswarm
-    and mean-|SHAP| charts, 200 samples is sufficient — the visual does
+    and mean-|SHAP| charts, 200 samples is sufficient - the visual does
     not meaningfully change with 1400 rows but the compute time does.
  
     Returns:
-        shap_vals   np.ndarray shape (n_explain, n_features) — SHAP for class 1
+        shap_vals   np.ndarray shape (n_explain, n_features) - SHAP for class 1
         feat_names  list of feature name strings
     """
     X = np.asarray(X, dtype=np.float64)
  
-    # Subsample rows for speed — 200 rows is enough for visual SHAP summaries
+    # Subsample rows for speed - 200 rows is enough for visual SHAP summaries
     rng = np.random.default_rng(42)
     n   = min(max_explain, len(X))
     X   = X[rng.choice(len(X), size=n, replace=False)]
@@ -186,7 +186,7 @@ def shap_divergence_fig(
     Negative bar = Model B relies on this feature more.
     Near-zero bar = both models use this feature similarly.
  
-    This is a proper data-grounded explanation of why RSC is high or low —
+    This is a proper data-grounded explanation of why RSC is high or low -
     it shows exactly which features each model prioritises differently.
     """
     mean_abs_a = np.abs(sv_a).mean(axis=0)
@@ -209,7 +209,7 @@ def shap_divergence_fig(
         textposition="outside",
     ))
     fig.update_layout(
-        title=f"SHAP Feature Divergence — {a_n} vs {b_n}",
+        title=f"SHAP Feature Divergence - {a_n} vs {b_n}",
         xaxis_title=f"← {b_n} relies more     |     {a_n} relies more →",
         height=420,
         margin=dict(t=50, b=30, l=130),
@@ -232,7 +232,7 @@ def shap_mean_abs_comparison_fig(
     Side-by-side grouped bar chart of mean |SHAP| per feature for both models.
  
     This replaces the old MDI feature importance bar charts with SHAP-based
-    importance — SHAP is less biased toward high-cardinality features than MDI.
+    importance - SHAP is less biased toward high-cardinality features than MDI.
     """
     mean_abs_a = np.abs(sv_a).mean(axis=0)
     mean_abs_b = np.abs(sv_b).mean(axis=0)
@@ -253,7 +253,7 @@ def shap_mean_abs_comparison_fig(
     ))
     fig.update_layout(
         barmode="group",
-        title=f"Mean |SHAP| — {a_n} vs {b_n}",
+        title=f"Mean |SHAP| - {a_n} vs {b_n}",
         xaxis_tickangle=-35,
         yaxis_title="Mean |SHAP value|",
         height=380,
@@ -274,7 +274,7 @@ def scores_bar(s: dict, a_n: str, b_n: str):
         textposition="outside",
     ))
     fig.update_layout(
-        title=f"ECCM Scores — {a_n} + {b_n}",
+        title=f"ECCM Scores - {a_n} + {b_n}",
         yaxis=dict(range=[0, 1.15]),
         height=300, margin=dict(t=45, b=20),
     )
@@ -306,7 +306,7 @@ def weights_bar(w: dict, task: str):
         textposition="outside",
     ))
     fig.update_layout(
-        title=f"ECCM Sub-metric Weights — {task}",
+        title=f"ECCM Sub-metric Weights - {task}",
         yaxis=dict(range=[0, 0.75]),
         height=270, margin=dict(t=45, b=20),
     )
@@ -348,33 +348,33 @@ def xai_narrative(psc, fsc, rsc, eccm, a_n, b_n, task):
         return "high" if v >= 0.9 else "moderate" if v >= 0.65 else "low"
  
     psc_desc = {
-        "high":     "very similar internal structure — both models weight features almost identically.",
-        "moderate": "moderately similar structure — some divergence in how each model learned from data.",
-        "low":      "quite different structure — the models have learned very different internal representations.",
+        "high":     "very similar internal structure - both models weight features almost identically.",
+        "moderate": "moderately similar structure - some divergence in how each model learned from data.",
+        "low":      "quite different structure - the models have learned very different internal representations.",
     }[level(psc)]
     fsc_desc = {
         "high":     "predictions agree very closely on the same inputs.",
         "moderate": "predictions broadly agree, with divergence on harder borderline cases.",
-        "low":      "predictions frequently disagree — the models make different calls on the same data.",
+        "low":      "predictions frequently disagree - the models make different calls on the same data.",
     }[level(fsc)]
     rsc_desc = {
-        "high":     "nearly identical feature ranking — both models rely on the same features in the same order.",
+        "high":     "nearly identical feature ranking - both models rely on the same features in the same order.",
         "moderate": "broadly similar feature ranking, with some differences in emphasis.",
-        "low":      "very different feature priorities — each model relies on a largely different set of signals.",
+        "low":      "very different feature priorities - each model relies on a largely different set of signals.",
     }[level(rsc)]
  
     verdict = {
-        "High Compatibility":   f"Strong merge candidate — empirical success rate at this ECCM level is **{p:.0%}**.",
-        "Medium Compatibility": f"Borderline — empirical success rate is **{p:.0%}**. Check the blend curve before merging.",
-        "Low Compatibility":    f"Poor compatibility — empirical success rate is only **{p:.0%}**. Merging is likely to hurt performance.",
+        "High Compatibility":   f"Strong merge candidate - empirical success rate at this ECCM level is **{p:.0%}**.",
+        "Medium Compatibility": f"Borderline - empirical success rate is **{p:.0%}**. Check the blend curve before merging.",
+        "Low Compatibility":    f"Poor compatibility - empirical success rate is only **{p:.0%}**. Merging is likely to hurt performance.",
     }[tier]
  
     return "\n".join([
-        f"**{a_n} + {b_n}** — ECCM **{eccm:.3f}** · {emoji} {tier} · estimated success **{p:.0%}**",
+        f"**{a_n} + {b_n}** - ECCM **{eccm:.3f}** · {emoji} {tier} · estimated success **{p:.0%}**",
         "",
-        f"**PSC {psc:.3f}** — {psc_desc}",
-        f"**FSC {fsc:.3f}** — {fsc_desc}",
-        f"**RSC {rsc:.3f}** — {rsc_desc}",
+        f"**PSC {psc:.3f}** - {psc_desc}",
+        f"**FSC {fsc:.3f}** - {fsc_desc}",
+        f"**RSC {rsc:.3f}** - {rsc_desc}",
         "",
         f"**Verdict:** {verdict}",
     ])
@@ -383,12 +383,12 @@ def xai_narrative(psc, fsc, rsc, eccm, a_n, b_n, task):
 # ── EPC evidence table ─────────────────────────────────────────────────────────
 def epc_table(neighbours):
     if not neighbours:
-        st.caption("EPC evidence unavailable — history not loaded.")
+        st.caption("EPC evidence unavailable - history not loaded.")
         return
     rows = [{
         "#":          n["rank"],
-        "Model A":    n.get("model_a", "—"),
-        "Model B":    n.get("model_b", "—"),
+        "Model A":    n.get("model_a", "-"),
+        "Model B":    n.get("model_b", "-"),
         "PSC":        f"{n['psc']:.3f}",
         "FSC":        f"{n['fsc']:.3f}",
         "RSC":        f"{n['rsc']:.3f}",
@@ -403,7 +403,7 @@ def epc_table(neighbours):
 # PAGE
 # ══════════════════════════════════════════════════════════════════════════════
 st.title("🧬 Mergence")
-st.caption("Evolutionary Compatibility & Co-evolution Metric — Model Merge Platform")
+st.caption("Evolutionary Compatibility & Co-evolution Metric - Model Merge Platform")
  
 tab1, tab2, tab3 = st.tabs([
     "🔬 Simulator",
@@ -412,13 +412,13 @@ tab1, tab2, tab3 = st.tabs([
 ])
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 3 — ABOUT
+# TAB 3 - ABOUT
 # ══════════════════════════════════════════════════════════════════════════════
 with tab3:
     st.header("About Mergence")
     st.markdown("""
 **Mergence** is a BEng Software Engineering thesis project (IIT / University of Westminster, 2026)
-by Trevin Joseph. It proposes **ECCM** — the *Evolutionary Compatibility & Co-evolution Metric* —
+by Trevin Joseph. It proposes **ECCM** - the *Evolutionary Compatibility & Co-evolution Metric* -
 a composite score that predicts, before execution, whether merging two trained models will improve performance.
  
 ---
@@ -442,9 +442,9 @@ Weights are **task-specific**, learned from 1 380 historical merge experiments.
  
 | Component | What it shows |
 |-----------|--------------|
-| **SHAP Beeswarm** | Per-sample feature effects — direction and magnitude for each model |
+| **SHAP Beeswarm** | Per-sample feature effects - direction and magnitude for each model |
 | **Mean SHAP Comparison** | Which features matter most to each model (SHAP-based, less biased than MDI) |
-| **SHAP Divergence** | Exactly which features each model prioritises differently — grounds the RSC score |
+| **SHAP Divergence** | Exactly which features each model prioritises differently - grounds the RSC score |
 | **EPC Evidence Table** | Which historical merges the EPC prediction is based on |
 | **XAI Narrative** | Plain-English verdict on PSC, FSC, RSC, and ECCM |
  
@@ -458,7 +458,7 @@ Weights are **task-specific**, learned from 1 380 historical merge experiments.
 | ⚠️ Medium | 0.843 – 0.935 | 0.960 – 0.988 | 40 – 80 % |
 | ❌ Low | < 0.843 | < 0.960 | < 40 % |
  
-Thresholds derived from isotonic regression on 276 pairs × 5 blend ratios — not guessed.
+Thresholds derived from isotonic regression on 276 pairs × 5 blend ratios - not guessed.
  
 ---
  
@@ -466,8 +466,8 @@ Thresholds derived from isotonic regression on 276 pairs × 5 blend ratios — n
  
 | | Question | Where addressed |
 |-|----------|----------------|
-| RQ1 | How to quantify evolutionary pressure? | EPC evidence table — Simulator tab |
-| RQ2 | Which PSC/FSC/RSC combination is optimal? | ECCM Weights chart — Pair Analysis tab |
+| RQ1 | How to quantify evolutionary pressure? | EPC evidence table - Simulator tab |
+| RQ2 | Which PSC/FSC/RSC combination is optimal? | ECCM Weights chart - Pair Analysis tab |
 | RQ3 | Efficiency gains over a random baseline? | Tier gate + M2N2 optimisation results |
 | RQ4 | Is ECCM interpretable for non-experts? | SHAP beeswarm + divergence + XAI narrative |
  
@@ -476,19 +476,19 @@ Thresholds derived from isotonic regression on 276 pairs × 5 blend ratios — n
 """)
  
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 1 — SIMULATOR
+# TAB 1 - SIMULATOR
 # ══════════════════════════════════════════════════════════════════════════════
 with tab1:
     st.header("Compatibility Simulator")
  
-    with st.expander("👋 First time? Read this first"):
+    with st.expander("📝 User Manual"):
         st.markdown("""
-1. **Pick your task** (Fraud / Churn / Unknown) — sets scoring weights and tier thresholds.
-2. **Upload Model A and Model B** — `.pkl` files from a trained `RandomForestClassifier`.
-3. **Optionally upload a validation CSV** — the badge below shows which data mode is active.
-4. **Click ▶ Run Compatibility Check** — get a tier badge, four scores, EPC evidence, and a plain-English explanation.
+1. **Pick your task** (Fraud / Churn / Unknown): sets scoring weights and tier thresholds.
+2. **Upload Model A and Model B**: `.pkl` files from a trained `RandomForestClassifier`.
+3. **Optionally upload a validation CSV**: the badge below shows which data mode is active.
+4. **Click ▶ Run Compatibility Check**: get a tier badge, four scores, EPC evidence, and a plain-English explanation.
 5. **Visit 📊 Pair Analysis** for SHAP explanations, blend curve, and prediction distributions.
-6. **Optionally merge** — pick a blend ratio, click Merge, download the merged model.
+6. **Optionally merge**: pick a blend ratio, click Merge, download the merged model.
         """)
  
     st.divider()
@@ -507,7 +507,7 @@ with tab1:
     epc_trainer = load_epc(task)
  
     # Uploads
-    st.subheader("Step 1 — Upload")
+    st.subheader("Step 1 - Upload")
     c1, c2 = st.columns(2)
     with c1:
         file_a = st.file_uploader("Model A (.pkl)", type=["pkl"], key="fa")
@@ -543,10 +543,10 @@ with tab1:
  
     X_res, data_mode = resolve_data(ma, up_X)
     badge, desc = DATA_MODE_LABELS[data_mode]
-    st.info(f"{badge} — {desc}")
+    st.info(f"{badge} - {desc}")
  
     # Compatibility check
-    st.subheader("Step 2 — Check Compatibility")
+    st.subheader("Step 2 - Check Compatibility")
  
     if st.button("▶ Run Compatibility Check", type="primary", key="run"):
         with st.spinner("Computing ECCM…"):
@@ -583,12 +583,12 @@ with tab1:
         f"<div style='padding:12px 18px;border-radius:8px;"
         f"background:{hex_to_rgba(colour,0.12)};border-left:5px solid {colour};"
         f"font-size:1.1rem;font-weight:600;'>"
-        f"{emoji} {tier} — ECCM {ec:.4f}"
+        f"{emoji} {tier} - ECCM {ec:.4f}"
         f"&nbsp;&nbsp;·&nbsp;&nbsp;Estimated success probability: {s['p_success']:.0%}"
         f"</div>",
         unsafe_allow_html=True,
     )
-    st.caption("Success probability is empirically calibrated from 276 historical merge experiments — not a guess.")
+    st.caption("Success probability is empirically calibrated from 276 historical merge experiments, not a guess.")
     st.markdown("")
  
     # Metric cards
@@ -607,10 +607,10 @@ with tab1:
     rel = s.get("epc_reliability", 0.5)
     rel_icon = "🟢" if rel >= 0.7 else "🟡" if rel >= 0.4 else "🔴"
     st.caption(
-        f"{rel_icon} EPC reliability: {rel:.0%} — "
+        f"{rel_icon} EPC reliability: {rel:.0%} - "
         + ("close match to historical data." if rel >= 0.7 else
            "moderate match to historical data." if rel >= 0.4 else
-           "this pair is unlike past merges — EPC estimate is speculative.")
+           "this pair is unlike past merges - EPC estimate is speculative.")
     )
     epc_table(s.get("epc_neighbours", []))
     st.caption("Each row is a historical merge nearest to this pair in PSC/FSC/RSC space. "
@@ -622,15 +622,15 @@ with tab1:
  
     # Merge
     st.divider()
-    st.subheader("Step 3 — Merge  (requires labelled CSV)")
+    st.subheader("Step 3 - Merge  (requires labelled CSV)")
  
     if st.session_state["y"] is None:
         st.info("Upload a labelled validation CSV to enable this step.")
     else:
         if tier == "Low Compatibility":
-            st.error("⛔ High risk — merging is likely to reduce performance.")
+            st.error("⛔ High risk - merging is likely to reduce performance.")
         elif tier == "Medium Compatibility":
-            st.warning("⚠️ Moderate risk — check the blend curve on the Pair Analysis tab first.")
+            st.warning("⚠️ Moderate risk - check the blend curve on the Pair Analysis tab first.")
  
         proceed = True
         if tier in ("Low Compatibility", "Medium Compatibility"):
@@ -658,7 +658,7 @@ with tab1:
                 rc1.metric(f"{a_n} AUC", f"{auc_a:.6f}")
                 rc2.metric(f"{b_n} AUC", f"{auc_b:.6f}")
                 rc3.metric("Merged AUC", f"{auc_m:.6f}", delta=f"{delta:+.6f} vs best parent")
-                st.caption("Positive delta = the merged model beat the better parent — merge succeeded.")
+                st.caption("Positive delta = the merged model beat the better parent - merge succeeded.")
  
                 buf = io.BytesIO()
                 joblib.dump(
@@ -675,7 +675,7 @@ with tab1:
                            "re-uploaded into this Simulator.")
 
 # ══════════════════════════════════════════════════════════════════════════════
-# TAB 2 — PAIR ANALYSIS
+# TAB 2 - PAIR ANALYSIS
 # ══════════════════════════════════════════════════════════════════════════════
 with tab2:
     st.header("Pair Analysis")
@@ -747,13 +747,13 @@ with tab2:
         if sv_a is not None and sv_b is not None:
  
             # ── Row 1: Mean |SHAP| comparison ─────────────────────────────
-            st.markdown("#### Mean |SHAP| — Feature Importance per Model")
+            st.markdown("#### Mean |SHAP| - Feature Importance per Model")
             st.plotly_chart(
                 shap_mean_abs_comparison_fig(sv_a, sv_b, sfeat, a_n, b_n),
                 use_container_width=True,
             )
             st.caption(
-                "Bar height = mean absolute SHAP value across the validation samples — "
+                "Bar height = mean absolute SHAP value across the validation samples - "
                 "how much that feature shifts predictions on average, regardless of direction. "
                 "SHAP-based importance is less biased than the built-in Random Forest MDI importance. "
                 "Matching tall bars across both models = both rely on the same signals (high RSC). "
@@ -763,7 +763,7 @@ with tab2:
             st.divider()
  
             # ── Row 3: SHAP divergence ────────────────────────────────────────
-            st.markdown("#### SHAP Feature Divergence — Why RSC Is High or Low")
+            st.markdown("#### SHAP Feature Divergence - Why RSC Is High or Low")
             st.plotly_chart(
                 shap_divergence_fig(sv_a, sv_b, sfeat, a_n, b_n),
                 use_container_width=True,
@@ -808,8 +808,8 @@ with tab2:
         st.subheader("ECCM Sub-metric Weights")
         st.plotly_chart(weights_bar(w, t), use_container_width=True)
         task_note = {
-            "fraud":   "For fraud, FSC dominates — prediction agreement is the strongest predictor of merge success.",
-            "churn":   "For churn, weights are more balanced — structural signals (PSC, RSC) carry more weight.",
+            "fraud":   "For fraud, FSC dominates - prediction agreement is the strongest predictor of merge success.",
+            "churn":   "For churn, weights are more balanced and structural signals (PSC, RSC) carry more weight.",
             "unknown": "Combined weights used (learned from both fraud and churn experiments).",
         }.get(t, "")
         st.caption(
@@ -836,7 +836,7 @@ with tab2:
             st.caption(
                 "Each dot = one validation sample. "
                 "Dots on the diagonal = both models gave the same probability. "
-                "Off-diagonal dots = disagreement — most sensitive to the blend ratio. "
+                "Off-diagonal dots = disagreement - most sensitive to the blend ratio. "
                 "Red = class 1 (fraud / churn), blue = class 0."
             )
         except Exception as e:
