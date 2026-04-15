@@ -4,15 +4,6 @@ streamlit_app.py - Mergence ECCM Platform
 Tab 1  Compatibility Simulator   upload → scores → XAI → merge
 Tab 2  Pair Analysis             SHAP beeswarm / SHAP divergence / blend curve / weights / distributions
 Tab 3  About
-
-UX decisions in this version:
-  - Feature importance charts removed from Tab 1 (they live in Tab 2 - no duplication)
-  - Tab 1 is kept to: upload → badge → scores → EPC table → XAI → merge only
-  - Tab 2 groups all visual analysis; every chart has a short caption
-  - Captions are one sentence maximum - just enough to orient a first-time reader
-  - Onboarding is a single collapsed expander so it doesn't clutter the page
-  - No repeated dividers between every section - used only where sections really change
-  - hex_to_rgba() fixes the Plotly scatterpolar fillcolor crash
 """
 
 import io
@@ -483,12 +474,12 @@ with tab1:
  
     with st.expander("📝 User Manual"):
         st.markdown("""
-1. **Pick your task** (Fraud / Churn / Unknown): sets scoring weights and tier thresholds.
-2. **Upload Model A and Model B**: `.pkl` files from a trained `RandomForestClassifier`.
-3. **Optionally upload a validation CSV**: the badge below shows which data mode is active.
-4. **Click ▶ Run Compatibility Check**: get a tier badge, four scores, EPC evidence, and a plain-English explanation.
-5. **Visit 📊 Pair Analysis** for SHAP explanations, blend curve, and prediction distributions.
-6. **Optionally merge**: pick a blend ratio, click Merge, download the merged model.
+            1. **Choose your task type** (Fraud, Churn or Unknown). This controls which ECCM weights and compatibility thresholds are applied.
+            2. **Upload Model A and Model B** as `.pkl` files. Both should be trained `RandomForestClassifier` objects.
+            3. **Optionally upload a validation CSV.** The data quality badge will update to show which mode is active. A labelled CSV unlocks the merge step and the blend curve.
+            4. **Click Run Compatibility Check** to compute the ECCM score, tier, EPC evidence and a plain-English explanation.
+            5. **Open the Pair Analysis tab** for SHAP explanations, the blend ratio curve and prediction distributions.
+            6. **Optionally merge the models** by picking a blend ratio and clicking Merge and Evaluate. You can download the result as a `.pkl`.
         """)
  
     st.divider()
@@ -753,11 +744,13 @@ with tab2:
                 use_container_width=True,
             )
             st.caption(
-                "Bar height = mean absolute SHAP value across the validation samples - "
-                "how much that feature shifts predictions on average, regardless of direction. "
-                "SHAP-based importance is less biased than the built-in Random Forest MDI importance. "
-                "Matching tall bars across both models = both rely on the same signals (high RSC). "
-                "Tall bar for one model only = that model learned something the other did not."
+                "Bar height represents the mean absolute SHAP value across all validation samples, "
+                "which measures how much each feature shifts predictions on average regardless of direction. "
+                "SHAP-based importance is less biased toward high-cardinality features than the built-in "
+                "Random Forest MDI importance. "
+                "Where both models show a tall bar for the same feature, they are relying on the same signal "
+                "and this will be reflected in a higher RSC score. "
+                "A tall bar for one model only means that model picked up something the other did not."
             )
  
             st.divider()
@@ -776,12 +769,12 @@ with tab2:
             )[0, 1])
  
             st.caption(
-                f"Each bar shows mean|SHAP_A| − mean|SHAP_B| for that feature. "
-                f"**Blue bars (positive)** = {a_n} relies on this feature more. "
-                f"**Red bars (negative)** = {b_n} relies on this feature more. "
-                f"Near-zero bars = both models treat this feature similarly. "
-                f"SHAP-based RSC correlation for this pair: **{shap_rsc:.3f}** "
-                f"(compare with RSC = {s['rsc']:.3f} from feature importance ranking)."
+                f"Each bar shows mean|SHAP_A| minus mean|SHAP_B| for that feature. "
+                f"Blue bars indicate features that {a_n} relies on more heavily. "
+                f"Red bars indicate features that {b_n} prioritises instead. "
+                f"Features near zero are treated similarly by both models. "
+                f"The SHAP-based RSC correlation for this pair is **{shap_rsc:.3f}** "
+                f"(the RSC reported above was {s['rsc']:.3f}, computed from feature importance rankings rather than SHAP values)."
             )
  
     # ── Section 2: Blend Ratio AUC Curve ──────────────────────────────────────
@@ -792,9 +785,10 @@ with tab2:
             fig_b, br, ba = blend_curve_fig(ma_, mb_, X_, y_, a_n, b_n)
             st.plotly_chart(fig_b, use_container_width=True)
             st.caption(
-                f"Each point = merged AUC at that blend ratio. "
-                f"Green line = optimal ratio ({br:.2f}, AUC {ba:.6f}). "
-                f"A flat curve means the ratio choice barely matters; a sharp peak means one ratio is clearly best."
+                f"Each point on the curve shows the merged AUC at a given blend weight. "
+                f"The optimal ratio is {br:.2f}, yielding an AUC of {ba:.6f}. "
+                f"A flat curve means the exact ratio has little practical effect. "
+                f"A sharp peak means one ratio is clearly best and is worth targeting precisely."
             )
         except Exception as e:
             st.warning(f"Could not compute blend curve: {e}")
@@ -808,15 +802,15 @@ with tab2:
         st.subheader("ECCM Sub-metric Weights")
         st.plotly_chart(weights_bar(w, t), use_container_width=True)
         task_note = {
-            "fraud":   "For fraud, FSC dominates - prediction agreement is the strongest predictor of merge success.",
-            "churn":   "For churn, weights are more balanced and structural signals (PSC, RSC) carry more weight.",
-            "unknown": "Combined weights used (learned from both fraud and churn experiments).",
-        }.get(t, "")
+            "fraud":   "For fraud detection, FSC carries the most weight because prediction agreement turned out to be the strongest predictor of whether a merge would succeed.",
+            "churn":   "For churn prediction, the weights are more balanced, with structural signals like PSC and RSC carrying more relative importance.",
+            "unknown": "These are the combined weights learned across both fraud and churn experiments.",
+        }.get(t, "")        
         st.caption(
-            f"Taller bar = stronger predictor of merge success for **{t}**. "
-            f"Weights learned from 1 380 historical experiments. {task_note}"
+            f"A taller bar indicates a stronger predictor of merge success for the {t} task. "
+            f"Weights were learned from 1,380 historical merge experiments. {task_note}"
         )
- 
+
     # ── Section 4: Prediction Distributions ───────────────────────────────────
     if X_ is not None and y_ is not None:
         st.divider()
@@ -824,20 +818,20 @@ with tab2:
         try:
             pa = ma_.predict_proba(X_)[:, 1]
             pb = mb_.predict_proba(X_)[:, 1]
- 
+
             st.plotly_chart(dist_fig(pa, pb, a_n, b_n), use_container_width=True)
             st.caption(
-                "Overlaid histograms of each model's predicted probability for class 1. "
-                "Similar shapes = models behave alike (high FSC). "
-                "Models peaking near 0 and 1 are more decisive than those clustering in the middle."
-            )
- 
+                "These histograms show the spread of predicted class probabilities across the validation set. "
+                "When both distributions look similar in shape, the models are behaving alike, which corresponds to a high FSC score. "
+                "Models with peaks near 0 and 1 are making more decisive predictions than those clustering in the middle range."
+            )       
+
             st.plotly_chart(scatter_fig(pa, pb, y_, a_n, b_n), use_container_width=True)
             st.caption(
-                "Each dot = one validation sample. "
-                "Dots on the diagonal = both models gave the same probability. "
-                "Off-diagonal dots = disagreement - most sensitive to the blend ratio. "
-                "Red = class 1 (fraud / churn), blue = class 0."
+                "Each point represents one validation sample, plotted by the probability each model assigned to it. "
+                "Points on the diagonal mean both models agreed. "
+                "Points off the diagonal are cases where the models disagreed, and these are the samples most sensitive to the blend ratio you choose. "
+                "Red points are class 1 instances (fraud or churn). Blue points are class 0."
             )
         except Exception as e:
             st.warning(f"Distribution plots failed: {e}")
