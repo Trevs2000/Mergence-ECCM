@@ -5,7 +5,7 @@ ECCM = w_psc × PSC + w_fsc × FSC + w_rsc × RSC + w_epc × EPC
 
 Key design decisions:
   - Task-specific weights (fraud vs churn) derived from per-task EPC training
-  - FSC fallback chain: real CSV → embedded sample → synthetic → imputed
+  - FSC fallback chain: real CSV to embedded sample to synthetic to imputed
   - Data-driven tier thresholds via isotonic regression on 276-pair results
   - EPC via contextual k-NN (not a frozen regressor)
 """
@@ -31,7 +31,7 @@ TASK_WEIGHTS = {
 }
 
 # ── Data-driven tier thresholds ───────────────────────────────────────────────
-# Derived from isotonic regression on per-pair ECCM vs success-rate data.
+# Derived from isotonic regression on per-pair ECCM vs success rate data.
 # P(success) crosses ~0.55 at the low→medium boundary,
 # P(success) crosses ~0.80 at the medium→high boundary.
 TIER_THRESHOLDS = {

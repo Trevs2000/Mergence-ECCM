@@ -42,7 +42,7 @@ class RSCCalculator:
         Example:
         Model A importance: [fraud_amount: 0.4, num_txns: 0.3, age: 0.3]
         Model B importance: [fraud_amount: 0.35, num_txns: 0.35, age: 0.3]
-        → Correlation ≈ 0.99 (very similar)
+        Correlation ≈ 0.99 (very similar)
         """
         imp_a = self.get_feature_importance(model_a)
         imp_b = self.get_feature_importance(model_b)

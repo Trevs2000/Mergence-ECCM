@@ -32,7 +32,7 @@ class FSCCalculator:
         
         Soft predictions let us see confidence.
         Model A very confident (0.8) vs Model B not sure (0.51)
-        → FSC catches this nuance
+        FSC catches this nuance
         """
         if hasattr(model, 'predict_proba'):
             proba = model.predict_proba(X)
@@ -58,12 +58,6 @@ class FSCCalculator:
         
         Normalize to [0, 1]:
         (r + 1) / 2  (since r is in [-1, 1])
-        
-        Example:
-        Model A predictions: [0.1, 0.5, 0.9]
-        Model B predictions: [0.2, 0.4, 0.8]
-        → Strong positive correlation → r ≈ 0.99
-        → Normalized: ≈ 1.0 (excellent agreement)
         """
         try:
             r, _ = pearsonr(pred_a, pred_b)
@@ -81,11 +75,6 @@ class FSCCalculator:
         Why?
         For classification, we often care about same predicted class,
         not exact probability agreement.
-        
-        Example:
-        Model A: [0.8, 0.3, 0.9] → labels [1, 0, 1]
-        Model B: [0.75, 0.4, 0.85] → labels [1, 0, 1]
-        → 100% agreement
         
         Formula: accuracy_score(binary_a, binary_b)
         """
