@@ -2,7 +2,7 @@
 streamlit_app.py - Mergence ECCM Platform
 
 Tab 1  Compatibility Simulator   upload → scores → XAI → merge
-Tab 2  Pair Analysis             SHAP beeswarm / SHAP divergence / blend curve / weights / distributions
+Tab 2  Pair Analysis             SHAP divergence / blend curve / weights / distributions
 Tab 3  About
 """
 
@@ -133,7 +133,7 @@ def compute_shap_values(
     For high-dimensional data (e.g. 2000+ one-hot features) this is the
     only practical choice in an interactive app.
  
-    We also cap the number of rows explained at max_explain. For beeswarm
+    We also cap the number of rows explained at max_explain.
     and mean-|SHAP| charts, 200 samples is sufficient - the visual does
     not meaningfully change with 1400 rows but the compute time does.
  
@@ -460,7 +460,7 @@ Thresholds derived from isotonic regression on 276 pairs × 5 blend ratios - not
 | RQ1 | How to quantify evolutionary pressure? | EPC evidence table - Simulator tab |
 | RQ2 | Which PSC/FSC/RSC combination is optimal? | ECCM Weights chart - Pair Analysis tab |
 | RQ3 | Efficiency gains over a random baseline? | Tier gate + M2N2 optimisation results |
-| RQ4 | Is ECCM interpretable for non-experts? | SHAP beeswarm + divergence + XAI narrative |
+| RQ4 | Is ECCM interpretable for non-experts? | SHAP divergence + XAI narrative |
  
 ---
 *Trevin Joseph · w1953285 · BEng Software Engineering · IIT / University of Westminster · 2026*
