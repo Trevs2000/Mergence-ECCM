@@ -835,8 +835,3 @@ with tab2:
             )
         except Exception as e:
             st.warning(f"Distribution plots failed: {e}")
- 
-    # ── Section 5: XAI Narrative ───────────────────────────────────────────────
-    st.divider()
-    st.subheader("🧠 XAI Narrative")
-    st.markdown(xai_narrative(s["psc"], s["fsc"], s["rsc"], ec, a_n, b_n, t))
