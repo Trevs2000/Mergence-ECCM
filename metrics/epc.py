@@ -56,6 +56,42 @@ class EPCTrainer:
         print(f"  EPC: {len(merge_history)} merges loaded | RF Train R²={r2:.4f}")
         return r2
 
+    def append_and_update(self, psc: float, fsc: float, rsc: float,
+                          improvement: float, model_a: str = "", model_b: str = "",
+                          blend_ratio: float = 0.5, save_path: str = None):
+        """
+        Append one new merge outcome to the live history and update the k-NN store.
+        Optionally persist to disk.
+
+        This is the method the Streamlit app calls after a merge completes.
+        No RF retraining — that only happens in train_epc.py when weights need
+        updating. The k-NN update is instant (just append a row to numpy array).
+        """
+        new_row = np.array([[psc, fsc, rsc, improvement]])
+
+        if self._history is None:
+            self._history = new_row
+        else:
+            self._history = np.vstack([self._history, new_row])
+
+        # Also update the DataFrame (used for the neighbour evidence table in UI)
+        new_df_row = pd.DataFrame([{
+            "psc": psc, "fsc": fsc, "rsc": rsc,
+            "improvement": improvement,
+            "model_a": model_a, "model_b": model_b,
+            "blend_ratio": blend_ratio,
+            "success": int(improvement > 0),
+        }])
+        if self._history_df is None:
+            self._history_df = new_df_row
+        else:
+            self._history_df = pd.concat(
+                [self._history_df, new_df_row], ignore_index=True
+            )
+
+        if save_path:
+            self.save(save_path)
+
     # ── Prediction ───────────────────────────────────────────────────────────
 
     def predict_with_context(

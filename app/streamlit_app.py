@@ -32,6 +32,7 @@ from metrics.eccm import (
     synthetic_validation_from_rf,
 )
 from metrics.epc import EPCTrainer
+EPC_SAVE_PATH = "./models/epc_model_live.pkl"
 
 # ── Page config ────────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -541,19 +542,29 @@ with tab1:
     if st.button("▶ Run Compatibility Check", type="primary", key="run"):
         with st.spinner("Computing ECCM…"):
             try:
-                calc = ECCMCalculator(task=task)
-                calc.epc = epc_trainer
+                calc = ECCMCalculator(task=task, epc_path=EPC_SAVE_PATH)
+                # Optional fallback: if you still want task-specific pretrained EPC
+                # when no live file exists yet, keep this:
+                if calc.epc._history is None and calc.epc._rf_model is None:
+                    calc.epc = epc_trainer
+
                 scores = calc.compute(ma, mb, X=X_res)
+
                 st.session_state.update({
-                    "scores": scores, "ec": scores["eccm"],
-                    "ma": ma, "mb": mb,
-                    "X": X_res, "y": up_y,
-                    "a_n": a_name, "b_n": b_name,
+                    "scores": scores,
+                    "ec": scores["eccm"],
+                    "ma": ma,
+                    "mb": mb,
+                    "X": X_res,
+                    "y": up_y,
+                    "a_n": a_name,
+                    "b_n": b_name,
                     "feat": feat_names or [],
                     "task": task,
+                    "calc": calc,   # store calculator so merge step can update EPC
                     "done": True,
-                    # Clear any cached SHAP values from a previous run
-                    "shap_a": None, "shap_b": None,
+                    "shap_a": None,
+                    "shap_b": None,
                 })
             except Exception as e:
                 st.error(f"Computation failed: {e}")
@@ -633,36 +644,52 @@ with tab1:
                 help="Use the optimal ratio from the Pair Analysis blend curve.",
             )
  
-            if st.button("⚗️ Merge & Evaluate", type="primary", key="merge"):
+            if st.button("🚀 Merge Evaluate", type="primary", key="merge"):
                 with st.spinner("Merging…"):
-                    X_m, y_m = st.session_state["X"], st.session_state["y"]
-                    pa_ = st.session_state["ma"].predict_proba(X_m)[:, 1]
-                    pb_ = st.session_state["mb"].predict_proba(X_m)[:, 1]
-                    auc_a = roc_auc_score(y_m, pa_)
-                    auc_b = roc_auc_score(y_m, pb_)
-                    auc_m = roc_auc_score(y_m, blend_r * pa_ + (1 - blend_r) * pb_)
+                    Xm, ym = st.session_state["X"], st.session_state["y"]
+                    pa = st.session_state["ma"].predict_proba(Xm)[:, 1]
+                    pb = st.session_state["mb"].predict_proba(Xm)[:, 1]
+                    auc_a = roc_auc_score(ym, pa)
+                    auc_b = roc_auc_score(ym, pb)
+                    auc_m = roc_auc_score(ym, blend_r * pa + (1 - blend_r) * pb)
                     delta = auc_m - max(auc_a, auc_b)
- 
-                st.success(f"Merged AUC: **{auc_m:.6f}**")
-                rc1, rc2, rc3 = st.columns(3)
-                rc1.metric(f"{a_n} AUC", f"{auc_a:.6f}")
-                rc2.metric(f"{b_n} AUC", f"{auc_b:.6f}")
-                rc3.metric("Merged AUC", f"{auc_m:.6f}", delta=f"{delta:+.6f} vs best parent")
-                st.caption("Positive delta = the merged model beat the better parent - merge succeeded.")
- 
-                buf = io.BytesIO()
-                joblib.dump(
-                    BlendedModel(st.session_state["ma"], st.session_state["mb"], blend_r),
-                    buf,
-                )
-                buf.seek(0)
-                st.download_button(
-                    "⬇️ Download Merged Model (.pkl)", buf,
-                    file_name=f"merged_{a_n}_{b_n}_r{blend_r:.2f}.pkl",
-                    mime="application/octet-stream",
-                )
-                st.caption("The merged model has `predict_proba`, `feature_importances_`, and can be "
-                           "re-uploaded into this Simulator.")
+
+                    # Live EPC update after actual merge outcome is known
+                    calc = st.session_state.get("calc")
+                    result = st.session_state.get("scores", {})
+
+                    if calc is not None and result:
+                        calc.epc.append_and_update(
+                            psc=result["psc"],
+                            fsc=result["fsc"],
+                            rsc=result["rsc"],
+                            improvement=delta,
+                            model_a=st.session_state["a_n"],
+                            model_b=st.session_state["b_n"],
+                            blend_ratio=blend_r,
+                            save_path=EPC_SAVE_PATH,
+                        )
+
+                    st.success(f"Merged AUC: **{auc_m:.6f}**")
+                    rc1, rc2, rc3 = st.columns(3)
+                    rc1.metric(f"{a_n} AUC", f"{auc_a:.6f}")
+                    rc2.metric(f"{b_n} AUC", f"{auc_b:.6f}")
+                    rc3.metric("Merged AUC", f"{auc_m:.6f}", delta=f"{delta:+.6f} vs best parent")
+                    st.caption("Positive delta = the merged model beat the better parent - merge succeeded.")
+
+                    buf = io.BytesIO()
+                    joblib.dump(
+                        BlendedModel(st.session_state["ma"], st.session_state["mb"], blend_r),
+                        buf,
+                    )
+                    buf.seek(0)
+                    st.download_button(
+                        "⬇️ Download Merged Model (.pkl)", buf,
+                        file_name=f"merged_{a_n}_{b_n}_r{blend_r:.2f}.pkl",
+                        mime="application/octet-stream",
+                    )
+                    st.caption("The merged model has `predict_proba`, `feature_importances_`, and can be "
+                               "re-uploaded into this Simulator.")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 2 - PAIR ANALYSIS
