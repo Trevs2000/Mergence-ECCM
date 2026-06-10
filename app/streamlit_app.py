@@ -25,6 +25,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
+from scripts.merge_and_evaluate import get_proba
 from metrics.eccm import (
     ECCMCalculator,
     get_tier,
@@ -48,27 +49,7 @@ def hex_to_rgba(hex_colour: str, alpha: float) -> str:
     return f"rgba({r},{g},{b},{alpha})"
  
 COLOURS = {"PSC": "#4c72b0", "FSC": "#55a868", "RSC": "#c44e52", "ECCM": "#8172b2"}
-
-def get_proba(model, X: np.ndarray) -> np.ndarray:
-    """
-    Simplified probability extractor for the web app.
-
-    Supports sklearn-style models with predict_proba().
-    For other model types (e.g., PyTorch MLP), raise a clear error
-    so the app fails gracefully instead of crashing on import.
-    """
-    if hasattr(model, "predict_proba"):
-        proba = model.predict_proba(X)
-        if proba.ndim == 2 and proba.shape[1] >= 2:
-            return proba[:, 1].astype(np.float32)
-        return proba.flatten().astype(np.float32)
-
-    raise ValueError(
-        f"Model type {type(model).__name__} is not supported in the web demo. "
-        "Use a sklearn classifier with predict_proba(), "
-        "or run the full desktop version for PyTorch / Keras models."
-)
-
+ 
 # ── BlendedModel ──────────────────────────────────────────────────────────────
 class BlendedModel(BaseEstimator, ClassifierMixin):
     """Sklearn-compatible blended RF - has feature_importances_, predict_proba, predict."""
