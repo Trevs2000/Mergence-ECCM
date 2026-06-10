@@ -10,22 +10,22 @@ import io
 import os
 import sys
 from pathlib import Path
- 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if PROJECT_ROOT not in sys.path:
-    sys.path.append(PROJECT_ROOT)
-    
+
 import joblib
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from scripts.merge_and_evaluate import get_proba
 import streamlit as st
 import shap
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.metrics import roc_auc_score
- 
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+from scripts.merge_and_evaluate import get_proba
 from metrics.eccm import (
     ECCMCalculator,
     get_tier,
