@@ -42,9 +42,9 @@ from .epc import EPCTrainer
  
 # ── Task-specific weights ─────────────────────────────────────────────────────
 TASK_WEIGHTS = {
-    "fraud":   {"w_psc": 0.333, "w_fsc": 0.333, "w_rsc": 0.333, "w_epc": 0.0},
-    "churn":   {"w_psc": 0.333, "w_fsc": 0.333, "w_rsc": 0.333, "w_epc": 0.0},
-    "unknown": {"w_psc": 0.333, "w_fsc": 0.333, "w_rsc": 0.333, "w_epc": 0.0},
+    "fraud":   {"w_psc": 0.186, "w_fsc": 0.614, "w_rsc": 0.200, "w_epc": 0.0},
+    "churn":   {"w_psc": 0.095, "w_fsc": 0.167, "w_rsc": 0.738, "w_epc": 0.0},
+    "unknown": {"w_psc": 0.082, "w_fsc": 0.437, "w_rsc": 0.481, "w_epc": 0.0},
 }
  
 # ── Tier thresholds ───────────────────────────────────────────────────────────
@@ -253,7 +253,7 @@ class ECCMCalculator:
             psc, fsc, rsc, epc, eccm,
             data_mode, epc_reliability, epc_neighbours,
             tier, tier_colour, tier_emoji, p_success, weights,
-            epc_ood   ← NEW (Issue #6): True when EPC is queried with NN
+            epc_ood   : True when EPC is queried with NN
                         scores against RF/ET training history.
         """
         X_data, data_mode = self._resolve_data(model_a, model_b, X)

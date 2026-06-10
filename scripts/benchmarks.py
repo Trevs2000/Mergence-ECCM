@@ -38,20 +38,26 @@ import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
 from sklearn.metrics import roc_auc_score
- 
+
+from train_fraud_models import FraudMLP   
+from train_churn_models import ChurnMLP
+
 # ── Output path ───────────────────────────────────────────────────────────────
 BASE = r"C:\Users\User\Desktop\ICTer\WordTemplate-1"
  
 # ── Config ────────────────────────────────────────────────────────────────────
+
+M2N2_TOP_N = 100 
+
 TASKS = {
     "fraud": {
         "merge_csv": f"{BASE}\\results\\merges\\fraud\\merge_results_new_eccm.csv",
-        "m2n2_csv":  f"{BASE}\\results\\merges\\fraud\\m2n2_results.csv",
+        "m2n2_csv":  f"{BASE}\\results\\merges\\fraud\\m2n2_results_topN{M2N2_TOP_N}.csv",
         "models_dir": f"{BASE}\\models\\fraud",
     },
     "churn": {
         "merge_csv": f"{BASE}\\results\\merges\\churn\\merge_results_new_eccm.csv",
-        "m2n2_csv":  f"{BASE}\\results\\merges\\churn\\m2n2_results.csv",
+        "m2n2_csv":  f"{BASE}\\results\\merges\\churn\\m2n2_results_topN{M2N2_TOP_N}.csv",
         "models_dir": f"{BASE}\\models\\churn",
     },
 }
@@ -59,14 +65,14 @@ TASKS = {
 OUTPUT_DIR         = f"{BASE}\\results\\benchmarks"
 RF_VARIANT_RANGE   = range(0, 24)      # v000–v023 RF merge candidates
 ET_VARIANT_RANGE   = range(200, 212)   # v200–v211 ExtraTrees merge candidates
+NN_VARIANT_RANGE = range(300, 312)     # v300–v311 MLP merge candidates
 PRECISION_AT_K     = [10, 20, 50]
 SEED               = 42
- 
  
 # ── Helpers ───────────────────────────────────────────────────────────────────
  
 def load_models(models_dir: str) -> dict:
-    """Load all RF and ET merge candidate pkl files."""
+    """Load all RF (v000-v023), ET (v200-v211), and MLP (v300-v311) merge candidate pkl files."""
     models = {}
     for pkl in sorted(Path(models_dir).glob("*.pkl")):
         parts = pkl.stem.rsplit("_v", 1)
@@ -76,7 +82,7 @@ def load_models(models_dir: str) -> dict:
             vid = int(parts[1])
         except ValueError:
             continue
-        if vid in RF_VARIANT_RANGE or vid in ET_VARIANT_RANGE:
+        if vid in RF_VARIANT_RANGE or vid in ET_VARIANT_RANGE or vid in NN_VARIANT_RANGE:
             models[pkl.stem] = joblib.load(pkl)
     return models
  

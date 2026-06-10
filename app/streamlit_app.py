@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+from scripts.merge_and_evaluate import get_proba
 import streamlit as st
 import shap
 from sklearn.base import BaseEstimator, ClassifierMixin
@@ -56,8 +57,8 @@ class BlendedModel(BaseEstimator, ClassifierMixin):
         self.model_a, self.model_b, self.ratio = model_a, model_b, ratio
  
     def predict_proba(self, X):
-        b = self.ratio * self.model_a.predict_proba(X)[:, 1] + \
-            (1 - self.ratio) * self.model_b.predict_proba(X)[:, 1]
+        b = self.ratio * get_proba(self.model_a, X) + \
+            (1 - self.ratio) * get_proba(self.model_b, X)
         return np.column_stack([1 - b, b])
  
     def predict(self, X):
@@ -65,8 +66,11 @@ class BlendedModel(BaseEstimator, ClassifierMixin):
  
     @property
     def feature_importances_(self):
-        return self.ratio * self.model_a.feature_importances_ + \
-               (1 - self.ratio) * self.model_b.feature_importances_
+        fi_a = getattr(self.model_a, "feature_importances_", None)
+        fi_b = getattr(self.model_b, "feature_importances_", None)
+        if fi_a is None or fi_b is None:
+            return None  # SHAP/PSC will gracefully skip when None
+        return self.ratio * fi_a + (1 - self.ratio) * fi_b
  
     @property
     def classes_(self):        return self.model_a.classes_
@@ -274,8 +278,8 @@ def scores_bar(s: dict, a_n: str, b_n: str):
  
  
 def blend_curve_fig(ma, mb, X, y, a_n, b_n):
-    pa = ma.predict_proba(X)[:, 1]
-    pb = mb.predict_proba(X)[:, 1]
+    pa = get_proba(ma_, X_)
+    pb = get_proba(mb_, X_)
     rs = np.linspace(0, 1, 21)
     au = [roc_auc_score(y, r * pa + (1 - r) * pb) for r in rs]
     br = rs[int(np.argmax(au))]
@@ -647,8 +651,8 @@ with tab1:
             if st.button("🚀 Merge Evaluate", type="primary", key="merge"):
                 with st.spinner("Merging…"):
                     Xm, ym = st.session_state["X"], st.session_state["y"]
-                    pa = st.session_state["ma"].predict_proba(Xm)[:, 1]
-                    pb = st.session_state["mb"].predict_proba(Xm)[:, 1]
+                    pa = get_proba(st.session_state["ma"], Xm)
+                    pb = get_proba(st.session_state["mb"], Xm)
                     auc_a = roc_auc_score(ym, pa)
                     auc_b = roc_auc_score(ym, pb)
                     auc_m = roc_auc_score(ym, blend_r * pa + (1 - blend_r) * pb)

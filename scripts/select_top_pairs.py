@@ -6,7 +6,7 @@ Used as input to merge_with_m2n2.py.
 import pandas as pd
 
 
-def select_top_pairs(results_csv: str, top_n: int = 50) -> pd.DataFrame:
+def select_top_pairs(results_csv: str, top_n: int = 100) -> pd.DataFrame:
     """
     Return the top-N unique pairs ranked by ECCM score (descending).
 
@@ -21,8 +21,9 @@ def select_top_pairs(results_csv: str, top_n: int = 50) -> pd.DataFrame:
         DataFrame with columns [model_a, model_b, eccm]
     """
     df   = pd.read_csv(results_csv)
-    uniq = df.drop_duplicates(subset=["model_a", "model_b"], keep="first")
-    top  = uniq.nlargest(top_n, "eccm")[["model_a", "model_b", "eccm"]].reset_index(drop=True)
+    df_sorted = df.sort_values(["eccm", "improvement"], ascending=[False, False])
+    uniq = df_sorted.drop_duplicates(subset=["model_a", "model_b"], keep="first")
+    top  = uniq.nlargest(top_n, "eccm")[["model_a", "model_b", "eccm", "improvement"]].reset_index(drop=True)
 
     print(f"Selected {len(top)} / {len(uniq)} pairs  "
           f"(ECCM {top['eccm'].min():.4f} – {top['eccm'].max():.4f})")

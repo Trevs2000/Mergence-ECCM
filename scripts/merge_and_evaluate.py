@@ -173,10 +173,9 @@ def load_all_merge_candidates(models_dir: str) -> dict:
     nn_models = load_models_by_range(models_dir, NN_VARIANT_RANGE)
     all_models = {**rf_models, **et_models, **nn_models}
     print(
-    f"  Loaded {len(rf_models)} RF + {len(et_models)} ET + {len(nn_models)} MLP"
-    f" = {len(all_models)} total candidates"
-    f" → C({len(all_models)},2) = {len(all_models)*(len(all_models)-1)//2} pairs"
-    )
+    f" Loaded {len(rf_models)} RF + {len(et_models)} ET + {len(nn_models)} MLP"
+    f" = {len(all_models)} total | "
+    f"{len(all_models)*(len(all_models)-1)//2} pairs")
     return all_models
  
  
@@ -205,7 +204,7 @@ class MergePipeline:
         os.makedirs(output_dir, exist_ok=True)
         self.eccm_calc  = ECCMCalculator(task=task)
  
-    def run(self, num_pairs: Optional[int] = None) -> pd.DataFrame:
+    def run(self, num_pairs: int | None = None) -> pd.DataFrame:
         """
         Run all merge experiments.
  

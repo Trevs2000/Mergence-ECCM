@@ -19,7 +19,10 @@ Everything else (CMA-ES config, dummy variable, result schema) is unchanged.
 import os
 from datetime import datetime
 from pathlib import Path
- 
+import sys
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import cma
 import joblib
 import numpy as np
@@ -28,13 +31,11 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
  
 from scripts.select_top_pairs import select_top_pairs
-from scripts.merge_and_evaluate import get_proba   # single source of truth
-
-import sys
-sys.path.insert(0, str(Path(__file__).parent))
-
+from scripts.merge_and_evaluate import get_proba
 from train_fraud_models import FraudMLP
 from train_churn_models import ChurnMLP
+
+TOP_N = 100
  
 # ── Output path ───────────────────────────────────────────────────────────────
 BASE = r"C:\Users\User\Desktop\ICTer\WordTemplate-1"
@@ -137,7 +138,7 @@ class M2N2Pipeline:
         self,
         top_pairs:       pd.DataFrame,
         fixed_csv:       str,
-        output_filename: str = "m2n2_results.csv",
+        output_filename = f"m2n2_results_topN{TOP_N}.csv",
     ) -> pd.DataFrame:
         """
         Args:
@@ -200,9 +201,6 @@ class M2N2Pipeline:
  
 # ── Entry point ───────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    import joblib
-    m = joblib.load(r"C:\Users\User\Desktop\ICTer\WordTemplate-1\models\fraud\fraud_mlp_v300.pkl")
-    print(type(m))
  
     # Fraud
     fraud_df = pd.read_csv("./data/fraud_preprocessed.csv")
@@ -212,7 +210,7 @@ if __name__ == "__main__":
         X_f, y_f, test_size=0.2, random_state=0, stratify=y_f
     )
     top_f = select_top_pairs(
-        f"{BASE}/results/merges/fraud/merge_results_new_eccm.csv", 630
+        f"{BASE}/results/merges/fraud/merge_results_new_eccm.csv", TOP_N
     )
     M2N2Pipeline(
         f"{BASE}/models/fraud",
@@ -226,7 +224,7 @@ if __name__ == "__main__":
     X_val_c   = churn_val.drop("Churn", axis=1).values
     y_val_c   = churn_val["Churn"].values
     top_c = select_top_pairs(
-        f"{BASE}/results/merges/churn/merge_results_new_eccm.csv", 630
+        f"{BASE}/results/merges/churn/merge_results_new_eccm.csv", TOP_N
     )
     M2N2Pipeline(
         f"{BASE}/models/churn",
