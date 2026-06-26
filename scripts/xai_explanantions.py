@@ -2,14 +2,17 @@
 xai_explanantions.py
 
 Generates plain-English XAI narratives and bar-chart plots for
-the top-N merge pairs.  Used by run_xai_global.py.
+the top-N merge pairs. Used by run_xai_global.py.
 
 Changes from previous version:
-- load_m2n2_results() now accepts top_n parameter and builds the correct
-  filename m2n2_results_topN{top_n}.csv to match merge_with_m2n2.py output.
-- explain_pair() guards against NaN opt_improvement (pair not in CMA-ES budget).
-- plot_pair() skips the AUC comparison chart gracefully when opt_best_auc
-  is NaN rather than crashing on min(vals) with a NaN in the list.
+- Uses the same BASE path as benchmarks.py / merge_with_m2n2.py
+  instead of repo-relative ./results paths.
+- load_m2n2_results() accepts top_n and builds
+  m2n2_results_topN{top_n}.csv correctly.
+- explain_pair() guards against NaN opt_improvement
+  (pair not in CMA-ES budget).
+- plot_pair() skips the AUC comparison chart gracefully when
+  opt_best_auc is NaN.
 """
 
 from pathlib import Path
@@ -18,12 +21,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+# ── Shared absolute base path ────────────────────────────────────────────────
+BASE = r"C:\Users\User\Desktop\ICTer\WordTemplate-1"
 
-# ── Loaders ───────────────────────────────────────────────────────────────────
+# ── Loaders ──────────────────────────────────────────────────────────────────
 
 def load_fixed_results(task: str) -> pd.DataFrame:
-    """Load the full fixed-ratio merge results (all 1,128 pairs × 5 ratios)."""
-    return pd.read_csv(f"./results/merges/{task}/merge_results_new_eccm.csv")
+    """Load the full fixed-ratio merge results (all pairs × 5 ratios)."""
+    path = Path(f"{BASE}\\results\\merges\\{task}\\merge_results_new_eccm.csv")
+    if not path.exists():
+        raise FileNotFoundError(f"[XAI] Fixed-ratio merge file not found: {path}")
+    return pd.read_csv(path)
 
 
 def load_m2n2_results(task: str, top_n: int = 100) -> pd.DataFrame:
@@ -32,37 +40,34 @@ def load_m2n2_results(task: str, top_n: int = 100) -> pd.DataFrame:
 
     Args:
         task  : "fraud" or "churn"
-        top_n : must match TOP_N used in merge_with_m2n2.py (default 100)
+        top_n : must match TOP_N used in merge_with_m2n2.py
 
     Returns empty DataFrame (not a crash) if the file does not exist yet,
-    so run_xai_global.py can still produce fixed-ratio XAI output while
-    merge_with_m2n2.py is still running.
+    so run_xai_global.py can still produce fixed-ratio XAI output.
     """
-    path = Path(f"./results/merges/{task}/m2n2_results_topN{top_n}.csv")
+    path = Path(f"{BASE}\\results\\merges\\{task}\\m2n2_results_topN{top_n}.csv")
     if not path.exists():
         print(
-            f"  [XAI] {task}: {path.name} not found. "
-            f"CMA-ES columns will be NaN — fixed-ratio XAI will still run."
+            f"[XAI] {task}: {path} not found. "
+            "CMA-ES columns will be NaN — fixed-ratio XAI will still run."
         )
         return pd.DataFrame()
     return pd.read_csv(path)
 
 
-# ── XAI narrative ─────────────────────────────────────────────────────────────
+# ── XAI narrative ────────────────────────────────────────────────────────────
 
 def explain_pair(row: pd.Series, task: str) -> str:
     """
     Generate a plain-English explanation for a single merged pair.
 
     Args:
-        row:  a row from the joined fixed + m2n2 DataFrame
-              (produced by run_xai_global joining on model_a, model_b)
+        row : a row from the joined fixed + m2n2 DataFrame
         task: "fraud" or "churn"
 
     Returns:
         Multi-sentence explanation string.
-        CMA-ES sentences are omitted if opt_improvement is NaN
-        (pair was not in the top-N CMA-ES budget).
+        CMA-ES sentences are omitted if opt_improvement is NaN.
     """
     a, b   = row["model_a"], row["model_b"]
     psc    = row["psc"]
@@ -72,7 +77,7 @@ def explain_pair(row: pd.Series, task: str) -> str:
     base_i = row["improvement"]
 
     agreement = (
-        "often agree"        if fsc > 0.90 else
+        "often agree" if fsc > 0.90 else
         "agree on most cases" if fsc > 0.65 else
         "frequently disagree"
     )
@@ -82,15 +87,17 @@ def explain_pair(row: pd.Series, task: str) -> str:
         f"For {task}, models {a} and {b} were selected with ECCM={eccm:.3f}.",
         f"PSC={psc:.3f}, FSC={fsc:.3f}, RSC={rsc:.3f}: "
         f"predictions {agreement} and feature rankings are {ranking}.",
-        (f"Fixed-ratio merging improved AUC by {base_i:.6f}."
-         if base_i >= 0
-         else f"Fixed-ratio merging reduced AUC by {abs(base_i):.6f}."),
+        (
+            f"Fixed-ratio merging improved AUC by {base_i:.6f}."
+            if base_i >= 0
+            else f"Fixed-ratio merging reduced AUC by {abs(base_i):.6f}."
+        ),
     ]
 
     # CMA-ES sentences — only when this pair was in the top-N budget
     opt_i = row.get("opt_improvement", np.nan)
-    opt_r = row.get("opt_best_ratio",  np.nan)
-    delta = row.get("opt_vs_fixed",    np.nan)
+    opt_r = row.get("opt_best_ratio", np.nan)
+    delta = row.get("opt_vs_fixed", np.nan)
 
     if pd.notna(opt_i) and pd.notna(opt_r) and pd.notna(delta):
         lines.append(f"CMA-ES found an optimal blend ratio of {opt_r:.3f} for {a}.")
@@ -108,7 +115,7 @@ def explain_pair(row: pd.Series, task: str) -> str:
     return " ".join(lines)
 
 
-# ── Plots ─────────────────────────────────────────────────────────────────────
+# ── Plots ────────────────────────────────────────────────────────────────────
 
 def plot_pair(row: pd.Series, task: str, out_dir: str) -> None:
     """
@@ -136,15 +143,13 @@ def plot_pair(row: pd.Series, task: str, out_dir: str) -> None:
     plt.close(fig)
 
     # ── Chart 2: AUC comparison bar ───────────────────────────────────────
-    # Requires opt_best_auc from the CMA-ES results.
-    # Skipped gracefully when the pair was not in the top-N budget.
-    opt_auc       = row.get("opt_best_auc",    np.nan)
-    best_par_auc  = row.get("best_parent_auc", np.nan)
-    fixed_best    = row.get("fixed_best_auc",  np.nan)
+    opt_auc      = row.get("opt_best_auc", np.nan)
+    best_par_auc = row.get("best_parent_auc", np.nan)
+    fixed_best   = row.get("fixed_best_auc", np.nan)
 
     if any(pd.isna(v) for v in [opt_auc, best_par_auc, fixed_best]):
         print(
-            f"  [XAI] Skipping AUC chart for {a}+{b} "
+            f"[XAI] Skipping AUC chart for {a}+{b} "
             f"(CMA-ES columns not available for this pair)."
         )
         return
@@ -153,9 +158,7 @@ def plot_pair(row: pd.Series, task: str, out_dir: str) -> None:
     labels = ["Best parent", "Fixed merge", "CMA-ES merge"]
     fig, ax = plt.subplots(figsize=(4, 3))
     ax.bar(labels, vals, color=["#4c72b0", "#55a868", "#c44e52"])
-    y_min = min(vals) - 0.001
-    y_max = max(vals) + 0.001
-    ax.set_ylim(y_min, y_max)
+    ax.set_ylim(min(vals) - 0.001, max(vals) + 0.001)
     ax.tick_params(axis="x", rotation=20)
     ax.set_title(f"{task} — {a} + {b} AUC")
     ax.set_ylabel("AUC")

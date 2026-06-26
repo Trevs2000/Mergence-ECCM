@@ -8,7 +8,6 @@ Tab 3  About
 
 import io
 import os
-import sys
 from pathlib import Path
 
 import joblib
@@ -21,9 +20,13 @@ import shap
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.metrics import roc_auc_score
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
+import sys as _sys
+from scripts import train_churn_models, train_fraud_models
+# Register classes under __main__ so joblib can unpickle models
+_main = _sys.modules.get("__main__")
+if _main is not None:
+    setattr(_main, "FraudMLP", train_fraud_models.FraudMLP)
+    setattr(_main, "ChurnMLP", train_churn_models.ChurnMLP)
 
 from scripts.merge_and_evaluate import get_proba
 from metrics.eccm import (
@@ -49,6 +52,19 @@ def hex_to_rgba(hex_colour: str, alpha: float) -> str:
     return f"rgba({r},{g},{b},{alpha})"
  
 COLOURS = {"PSC": "#4c72b0", "FSC": "#55a868", "RSC": "#c44e52", "ECCM": "#8172b2"}
+
+def _is_tree_model(m) -> bool:
+    return hasattr(m, "estimators_") or hasattr(m, "tree_")
+
+def _features_match_model(m, X) -> bool:
+    n = getattr(m, "n_features_in_", None)
+    if n is None:           # PyTorch MLP path
+        try:
+            first_layer = list(m.net.children())[0]
+            n = first_layer.in_features
+        except Exception:
+            return True     # can't determine — allow attempt
+    return X is not None and len(X) > 0 and X.shape[1] == n
  
 # ── BlendedModel ──────────────────────────────────────────────────────────────
 class BlendedModel(BaseEstimator, ClassifierMixin):
@@ -732,14 +748,24 @@ with tab2:
  
     # ── Section 1: SHAP Analysis ───────────────────────────────────────────────
     st.subheader("🔬 SHAP Explanations")
- 
-    if X_ is None:
+
+    if X_ is None or len(X_) == 0:
         st.info("Upload a validation CSV on the Simulator tab to compute SHAP values.")
+    elif not (_is_tree_model(ma_) and _is_tree_model(mb_)):
+        st.info(
+            "SHAP plots are currently available only for tree-based models "
+            "(e.g. RandomForest / ExtraTrees). "
+            "Upload RF/ET models to see SHAP explanations."
+        )
+    elif not (_features_match_model(ma_, X_) and _features_match_model(mb_, X_)):
+        st.info(
+            "The validation CSV feature columns do not match the uploaded models, "
+            "so SHAP explanations cannot be computed. "
+         "Use the same preprocessed feature set you used for training."
+        )
     else:
         # Compute SHAP values once and cache in session state
         if st.session_state.get("shap_a") is None:
-            # Animated progress bar with step labels so the user sees
-            # visible progress rather than a frozen screen.
             _prog   = st.progress(0)
             _status = st.empty()
  
@@ -819,19 +845,26 @@ with tab2:
     st.divider()
     st.subheader("Blend Ratio AUC Curve")
     if X_ is not None and y_ is not None:
-        try:
-            fig_b, br, ba = blend_curve_fig(ma_, mb_, X_, y_, a_n, b_n)
-            st.plotly_chart(fig_b, use_container_width=True)
-            st.caption(
-                f"Each point on the curve shows the merged AUC at a given blend weight. "
-                f"The optimal ratio is {br:.2f}, yielding an AUC of {ba:.6f}. "
-                f"A flat curve means the exact ratio has little practical effect. "
-                f"A sharp peak means one ratio is clearly best and is worth targeting precisely."
+        if not (_features_match_model(ma_, X_) and _features_match_model(mb_, X_)):
+            st.info(
+                "The validation CSV does not match the input feature shape expected by the models, "
+                "so the blend curve cannot be computed. "
+                "Use the same preprocessed feature set used for training."
             )
-        except Exception as e:
-            st.warning(f"Could not compute blend curve: {e}")
-    else:
-        st.info("Upload a labelled CSV on the Simulator tab to see this chart.")
+        else:
+            try:
+                fig_b, br, ba = blend_curve_fig(ma_, mb_, X_, y_, a_n, b_n)
+                st.plotly_chart(fig_b, use_container_width=True)
+                st.caption(
+                    f"Each point on the curve shows the merged AUC at a given blend weight. "
+                    f"The optimal ratio is {br:.2f}, yielding an AUC of {ba:.6f}. "
+                    f"A flat curve means the exact ratio has little practical effect. "
+                    f"A sharp peak means one ratio is clearly best and is worth targeting precisely."
+                    )
+            except Exception as e:
+                st.warning(f"Could not compute blend curve: {e}")
+            else:
+                st.info("Upload a labelled CSV on the Simulator tab to see this chart.")
  
     # ── Section 3: ECCM Weights ────────────────────────────────────────────────
     st.divider()
